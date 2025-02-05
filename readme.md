@@ -1,4 +1,4 @@
-# Ubuntu Docker Image
+# Ubuntu Docker
 
 [**DockerHub Repository Link**](https://hub.docker.com/repository/docker/registryhj/ubuntu/general)
 
