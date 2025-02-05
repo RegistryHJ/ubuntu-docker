@@ -1,0 +1,39 @@
+# vim:set ft=dockerfile:
+FROM ubuntu:24.04
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+
+RUN \
+	apt update; \
+	DEBIAN_FRONTEND=noninteractive \
+	apt install -y ca-certificates;
+
+COPY ubuntu.sources/arm64.list ubuntu.sources/amd64.list /
+
+RUN \
+  if [ "$(uname -m)" = "aarch64" ]; then \
+    cp /arm64.list /etc/apt/sources.list.d/ubuntu.sources; \
+  else \
+    cp /amd64.list /etc/apt/sources.list.d/ubuntu.sources; \
+  fi
+
+RUN rm /arm64.list /amd64.list
+
+RUN \
+  apt update; \
+  apt upgrade -y;\
+  apt install -y zsh && chsh -s `which zsh`; \
+  apt install -y git curl wget neofetch; \
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)";
+
+RUN \
+  sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME=""/' /root/.zshrc; \
+  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions --depth=1; \
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting --depth=1; \
+  git clone https://github.com/lukechilds/zsh-better-npm-completion ~/.oh-my-zsh/custom/plugins/zsh-better-npm-completion --depth=1; \  
+  sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-better-npm-completion)/' /root/.zshrc;
+
+COPY .zsh_prompt /root/.zsh_prompt
+RUN printf "source ~/.zsh_prompt" >> /root/.zshrc
+
+CMD ["/bin/zsh"]
