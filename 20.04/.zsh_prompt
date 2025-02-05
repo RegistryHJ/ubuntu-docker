@@ -1,0 +1,66 @@
+# Load Modules
+autoload -Uz vcs_info
+zmodload zsh/datetime
+
+# Git Zstyle Configuration
+zstyle ':vcs_info:git:*' formats '(git::%b)'
+zstyle ':vcs_info:*' enable git
+
+# Define Color Constant
+typeset -A COLOR
+COLOR=(
+  [G]='%F{#00FF00}'  # Green
+  [R]='%F{#FF0000}'  # Red
+  [W]='%F{#FFFFFF}'  # White
+  [C]='%F{#00FFFF}'  # Cyan
+  [M]='%F{#FF00FF}'  # Magenta
+  [O]='%F{#FFA500}'  # Orange
+  [Y]='%F{#FFFF00}'  # Yellow
+)
+
+# Define Initialize Format Constant
+RESET='%f'
+
+# Get Conda Info Function
+get_conda_info() {
+  [[ -n $CONDA_DEFAULT_ENV ]] && echo "(conda::$CONDA_DEFAULT_ENV)"
+}
+
+# Get Elapsed Time Function
+get_elapsed_time() {
+  if [[ -n $timer ]]; then
+    local elapsed=$(( (EPOCHREALTIME - timer) * 1000 ))
+    printf '(%.0fms)' $elapsed
+  fi
+}
+
+# Pre-execution hook
+preexec() {
+  timer=$EPOCHREALTIME
+}
+
+# Pre-prompt hook
+precmd() {
+  # Update VCS Info
+  vcs_info
+
+  # Define Prompt Components
+  local STATUS_INDICATOR="%(?. ${COLOR[G]}✓. ${COLOR[R]}✗)$RESET"
+  local USERNAME_HOST="${COLOR[W]}[%n @ %m]$RESET"
+  local DIRECTORY="${COLOR[C]}%~$RESET"
+  local GIT_INFO="${COLOR[M]}${vcs_info_msg_0_}$RESET"
+  local CONDA_INFO="${COLOR[O]}$(get_conda_info)$RESET"
+  local PROMPT_SYMBOL=" ${COLOR[C]}❯$RESET "
+  local ELAPSED_TIME="${COLOR[W]}$(get_elapsed_time)$RESET"
+  local CURRENT_TIME="${COLOR[Y]}[%*]$RESET"
+
+  # Setup Prompt
+  PROMPT="$STATUS_INDICATOR $USERNAME_HOST $DIRECTORY $GIT_INFO"$'\n'"$PROMPT_SYMBOL"
+  RPROMPT="$CONDA_INFO $ELAPSED_TIME $CURRENT_TIME"
+  
+  # Reset Timer
+  unset timer
+}
+
+# Enable Prompt Expansion
+setopt PROMPT_SUBST
