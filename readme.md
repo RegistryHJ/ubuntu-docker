@@ -1,6 +1,6 @@
 # Ubuntu Docker
 
-[**DockerHub Repository Link**](https://hub.docker.com/repository/docker/registryhj/ubuntu/general)
+[**DockerHub Repository Link**](https://hub.docker.com/r/registryhj/ubuntu)
 
 <br />
 
