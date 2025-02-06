@@ -4,9 +4,9 @@ FROM ubuntu:24.04
 RUN ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
 RUN \
-	apt update; \
-	DEBIAN_FRONTEND=noninteractive \
-	apt install -y ca-certificates;
+  apt update; \
+  DEBIAN_FRONTEND=noninteractive \
+  apt install -y ca-certificates;
 
 COPY ubuntu.sources/arm64.list ubuntu.sources/amd64.list /
 
