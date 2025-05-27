@@ -26,6 +26,17 @@ get_conda_info() {
   [[ -n $CONDA_DEFAULT_ENV ]] && echo "(conda::$CONDA_DEFAULT_ENV)"
 }
 
+# Get Venv Info Function
+get_venv_info() {
+  if [[ -n $VIRTUAL_ENV ]]; then
+    if [[ -n $VIRTUAL_ENV_PROMPT ]]; then
+      echo "(venv::$VIRTUAL_ENV_PROMPT)"
+    else
+      echo "(venv::${VIRTUAL_ENV:t})"
+    fi
+  fi
+}
+
 # Get Elapsed Time Function
 get_elapsed_time() {
   if [[ -n $timer ]]; then
@@ -34,29 +45,23 @@ get_elapsed_time() {
   fi
 }
 
-# Pre-execution hook
-preexec() {
-  timer=$EPOCHREALTIME
-}
-
 # Pre-prompt hook
 precmd() {
   # Update VCS Info
   vcs_info
-
   # Define Prompt Components
   local STATUS_INDICATOR="%(?. ${COLOR[G]}✓. ${COLOR[R]}✗)$RESET"
   local USERNAME_HOST="${COLOR[W]}[%n @ %m]$RESET"
   local DIRECTORY="${COLOR[C]}%~$RESET"
   local GIT_INFO="${COLOR[M]}${vcs_info_msg_0_}$RESET"
   local CONDA_INFO="${COLOR[O]}$(get_conda_info)$RESET"
+  local VENV_INFO="${COLOR[O]}$(get_venv_info)$RESET"
   local PROMPT_SYMBOL=" ${COLOR[C]}❯$RESET "
   local ELAPSED_TIME="${COLOR[W]}$(get_elapsed_time)$RESET"
   local CURRENT_TIME="${COLOR[Y]}[%*]$RESET"
-
   # Setup Prompt
   PROMPT="$STATUS_INDICATOR $USERNAME_HOST $DIRECTORY $GIT_INFO"$'\n'"$PROMPT_SYMBOL"
-  RPROMPT="$CONDA_INFO $ELAPSED_TIME $CURRENT_TIME"
+  RPROMPT="$CONDA_INFO $VENV_INFO $ELAPSED_TIME $CURRENT_TIME"
   
   # Reset Timer
   unset timer
