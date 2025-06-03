@@ -45,6 +45,11 @@ get_elapsed_time() {
   fi
 }
 
+# Pre-execution hook
+preexec() {
+  timer=$EPOCHREALTIME
+}
+
 # Pre-prompt hook
 precmd() {
   # Update VCS Info
